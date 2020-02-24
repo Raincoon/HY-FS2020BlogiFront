@@ -3,24 +3,26 @@ import Blog from './components/Blog'
 import Notification from './components/Notification'
 import Loginform from './components/LoginForm'
 import Blogform from './components/Blogform'
+import Togglable from './components/Togglable'
 import blogService from './services/blogs'
 import loginService from './services/login'
+
+
 
 const App = () => {
   const [blogs, setBlogs] = useState([])
   const [user, setUser] = useState(null)
   const [notif, setNotif] = useState(null)
-  const [username, setUsername] = useState('')
-  const [password, setPassword] = useState('')
-  const [title, setTitle] = useState('')
-  const [author, setAuthor] = useState('')
-  const [url, setUrl] = useState('')
+
+
+  const fetch = async () => {
+    const allBlogs = await blogService.getAll()
+    setBlogs(allBlogs.sort((b1, b2) => (b2.likes - b1.likes)
+
+    ))
+  }
 
   useEffect(() => {
-    const fetch = async () => {
-      const allBlogs = await blogService.getAll()
-      setBlogs(allBlogs)
-    }
     fetch()
   }, [])
 
@@ -41,40 +43,14 @@ const App = () => {
     }, 6000)
   }
 
-  //handlers
-  const handleUsernameField = (event) => {
-    setUsername(event.target.value)
-  }
-  const handlePasswordField = (event) => {
-    setPassword(event.target.value)
-  }
-  const handleTitleField = (event) => {
-    setTitle(event.target.value)
-  }
-  const handleAuthorField = (event) => {
-    setAuthor(event.target.value)
-  }
-  const handleUrlField = (event) => {
-    setUrl(event.target.value)
-  }
-
-  const handleLogin = async (event) => {
-    console.log('button pressed!')
-    event.preventDefault()
-    try {
-      const currentUser = await loginService.login({ username, password })
-      //if successfully logged in
-      window.localStorage.setItem(
-        'loggedBlogappUser', JSON.stringify(currentUser)
-      )
-      blogService.setToken(currentUser.token)
-      setUser(currentUser)
-      setUsername('')
-      setPassword('')
-    } catch (exeception) {
-      // if login failed
-      notifMsg('Login failed: wrong username or password')
-    }
+  //user functions
+  const handleLogin = async (account) => {
+    const currentUser = await loginService.login(account)
+    window.localStorage.setItem(
+      'loggedBlogappUser', JSON.stringify(currentUser)
+    )
+    blogService.setToken(currentUser.token)
+    setUser(currentUser)
   }
   const logOut = () => {
     window.localStorage.removeItem('loggedBlogappUser')
@@ -83,41 +59,27 @@ const App = () => {
     notifMsg('Logged out')
   }
 
-  const handleSubmit = async (event) => {
-    event.preventDefault()
+  //blog functions
+  const handleSubmit = async (blogToAdd) => {
+    const newBlog = await blogService.create(blogToAdd)
+    notifMsg('Blog ' + newBlog.title + ' by ' + newBlog.author + ' added!')
+    setBlogs(blogs.concat(newBlog))
+  }
+  const blogEdit = async newBlog => {
+    await blogService.update(newBlog.id, newBlog)
+    fetch()
+  }
+  const blogRemove = async id => {
     try {
-      const blogToAdd = {
-        title,
-        author,
-        url
-      }
-      console.log(blogToAdd)
-      const newBlog = await blogService.create(blogToAdd)
-
-      setBlogs(blogs.concat(newBlog))
-      setTitle('')
-      setAuthor('')
-      setUrl('')
-      notifMsg('Blog ' + newBlog.title + ' by ' + newBlog.author + ' added!')
+      await blogService.remove(id)
+      fetch()
+      notifMsg('Entry deleted!')
     } catch (error) {
-
       error.response.data.error ?
         notifMsg('Error: ' + error.response.data.error) :
-        notifMsg('Blog has duplicate name, not submitted')
+        notifMsg('Error: ' + error.message)
     }
   }
-
-  /* if (user === null) {
-    
-    return (
-      <div>
-        <h2>Log in to application</h2>
-        <Loginform
-          login={handleLogin} uname={username} pw={password} handleUnameFld={handleUsernameField} handlePwFld={handlePasswordField}
-        />
-      </div>
-    )
-  } */
 
   return (
     <div>
@@ -126,17 +88,19 @@ const App = () => {
       <div>
         {user === null ?
           <>
-            <Loginform login={handleLogin} uname={username} pw={password} handleUname={handleUsernameField} handlePw={handlePasswordField} />
+            <Loginform login={handleLogin} notif={notifMsg} />
             <br /></>
           :
           <>
             <p>Logged in as {user.name} <button onClick={logOut}>Log out</button></p>
-            <Blogform submit={handleSubmit} title={title} author={author} url={url} handleTitle={handleTitleField} handleAuthor={handleAuthorField} handleUrl={handleUrlField} />
+            <Togglable buttonLabel="Submit new blog">
+              <Blogform submit={handleSubmit} notif={notifMsg} />
+            </Togglable>
             <br /></>
         }
       </div>
       {blogs.map(blog =>
-        <Blog key={blog.id} blog={blog} />
+        <Blog key={blog.id} blog={blog} edit={blogEdit} remove={blogRemove} user={user} />
       )}
     </div>
   )

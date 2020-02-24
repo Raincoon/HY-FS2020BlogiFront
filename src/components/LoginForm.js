@@ -1,12 +1,39 @@
-import React from 'react'
+import React, { useState } from 'react'
 import Input from './Inputfield'
 
-const Loginform = ({ login, uname, pw, handleUname, handlePw }) => {
+const Loginform = ({ login, notif }) => {
+    const [username, setUsername] = useState('')
+    const [password, setPassword] = useState('')
+
+    //handlers
+    const handleUsernameField = (event) => {
+        setUsername(event.target.value)
+    }
+    const handlePasswordField = (event) => {
+        setPassword(event.target.value)
+    }
+
+    //login
+    const handleLogin = event => {
+        event.preventDefault()
+        const account = {
+            username,
+            password
+        }
+        try {
+            login(account)
+            setUsername('')
+            setPassword('')
+        } catch (exeception) {
+            // if login failed
+            notif('Login failed: wrong username or password')
+        }
+    }
 
     return (
-        <form onSubmit={login}>
-            <Input text="Username:" value={uname} onChange={handleUname} />
-            <Input text="Password:" value={pw} onChange={handlePw} />
+        <form onSubmit={handleLogin}>
+            <Input text="Username:" value={username} onChange={handleUsernameField} />
+            <Input text="Password:" value={password} onChange={handlePasswordField} />
             <button type="submit">Log In</button>
         </form>
     )
