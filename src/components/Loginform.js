@@ -33,8 +33,8 @@ const Loginform = ({ login, notif }) => {
 
     return (
         <form onSubmit={handleLogin}>
-            <Input text="Username:" value={username} onChange={handleUsernameField} />
-            <Input text="Password:" value={password} onChange={handlePasswordField} />
+            <Input className="usernameField" text="Username:" value={username} onChange={handleUsernameField} />
+            <Input className="passwordField" text="Password:" value={password} onChange={handlePasswordField} />
             <button type="submit">Log In</button>
         </form>
     )

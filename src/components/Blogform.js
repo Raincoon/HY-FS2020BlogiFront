@@ -42,9 +42,9 @@ const Blogform = ({ submit, notif }) => {
 
     return (
         <form onSubmit={submitBlog}>
-            <Input text="Title:" value={title} onChange={handleTitleField} />
-            <Input text="Author:" value={author} onChange={handleAuthorField} />
-            <Input text="Url:" value={url} onChange={handleUrlField} />
+            <Input className="titleField" text="Title:" value={title} onChange={handleTitleField} />
+            <Input className="authorField" text="Author:" value={author} onChange={handleAuthorField} />
+            <Input className="urlField" text="Url:" value={url} onChange={handleUrlField} />
             <button type="submit">Submit</button>
         </form>
     )
