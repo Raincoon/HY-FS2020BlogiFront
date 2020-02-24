@@ -1,4 +1,5 @@
 import React, { useState } from 'react'
+import PropTypes from 'prop-types'
 import Input from './Inputfield'
 
 const Loginform = ({ login, notif }) => {
@@ -37,6 +38,10 @@ const Loginform = ({ login, notif }) => {
             <button type="submit">Log In</button>
         </form>
     )
+}
+Loginform.propTypes = {
+    login: PropTypes.func.isRequired,
+    notif: PropTypes.func.isRequired
 }
 
 export default Loginform

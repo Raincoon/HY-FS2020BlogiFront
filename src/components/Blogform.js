@@ -1,4 +1,5 @@
 import React, { useState } from 'react'
+import PropTypes from 'prop-types'
 import Input from './Inputfield'
 
 const Blogform = ({ submit, notif }) => {
@@ -47,6 +48,11 @@ const Blogform = ({ submit, notif }) => {
             <button type="submit">Submit</button>
         </form>
     )
+}
+
+Blogform.propTypes = {
+    submit: PropTypes.func.isRequired,
+    notif: PropTypes.func.isRequired
 }
 
 export default Blogform

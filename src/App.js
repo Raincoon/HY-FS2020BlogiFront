@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react'
 import Blog from './components/Blog'
 import Notification from './components/Notification'
-import Loginform from './components/LoginForm'
+import Loginform from './components/Loginform'
 import Blogform from './components/Blogform'
 import Togglable from './components/Togglable'
 import blogService from './services/blogs'
